@@ -2,6 +2,10 @@
 
 A modern CMake template for C++ projects using **vcpkg**, ready for cross-compilation, documentation, and CI/CD.
 
+이 문서는 영어와 [한국어](./readme.ko.md) 버전이 제공됩니다.
+[![en](https://img.shields.io/badge/lang-en-green.svg)](./readme.md)
+[![ko](https://img.shields.io/badge/lang-ko-green.svg)](./readme.ko.md)
+
 ## Features
 
 - CMake presets

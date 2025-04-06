@@ -1,4 +1,6 @@
 # 모던 C++ CMake 템플릿
+[![en](https://img.shields.io/badge/lang-en-green.svg)](./readme.md)
+[![ko](https://img.shields.io/badge/lang-ko-red.svg)](./readme.ko.md)
 
 **vcpkg**를 사용하는 C++ 프로젝트용 모던 CMake 템플릿입니다. 크로스 컴파일, 문서화, CI/CD 환경을 지원합니다.
 
