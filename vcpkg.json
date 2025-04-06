@@ -1,0 +1,36 @@
+{
+  "dependencies": [
+    "eigen3",
+    {
+      "name": "opencv4",
+      "features": ["thread", "eigen", "jpeg", "png"],
+      "default-features": false
+    },
+    "cli11",
+    "spdlog",
+    {
+      "name": "pkgconf",
+      "host": true,
+      "platform": "windows"
+    }
+  ],
+  "features": {
+    "opencv-highgui": {
+      "description": "opencv highgui",
+      "dependencies": [
+        {
+          "name": "opencv4",
+          "features": ["highgui"],
+          "default-features": false
+        }
+      ]
+    }
+  },
+  "builtin-baseline": "b02e341c927f16d991edbd915d8ea43eac52096c",
+  "overrides": [
+    {
+      "name": "opencv4",
+      "version": "4.10.0"
+    }
+  ]
+}

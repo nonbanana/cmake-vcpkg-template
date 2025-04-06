@@ -1,0 +1,175 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 27,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "default",
+      "hidden": true,
+      "displayName": "default-internal-vcpkg",
+      "description": "default for inherit",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake"
+      },
+      "environment": {
+        "VCPKG_ROOT": "${sourceDir}/vcpkg"
+      }
+    },
+    {
+      "name": "inherit-gui",
+      "hidden": true,
+      "inherits": "default",
+      "displayName": "inherit-gui",
+      "description": "default with gui for inherit ",
+      "cacheVariables": {
+        "HAJIME_DEBUG_WITH_GUI": "ON"
+      }
+    },
+    {
+      "name": "inherit-vcpkg-clean",
+      "hidden": true,
+      "displayName": "default-clean",
+      "description": "vcpkg without binary cache",
+      "cacheVariables": {
+        "VCPKG_FEATURE_FLAGS": "-binarycaching"
+      }
+    },
+    {
+      "name": "default-aarch64-toolchain",
+      "hidden": true,
+      "inherits": "default",
+      "displayName": "default-amd64-aarch64",
+      "description": "default cross build without gui for inherit ",
+      "cacheVariables": {
+        "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/vcpkg-custom-triplet",
+        "VCPKG_TARGET_TRIPLET": "arm64-linux-cross"
+      },
+      "environment": {
+        "TRIPLET_VCPKG_CMAKE_CONFIGURE_OPTIONS": "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"
+      }
+    },
+    {
+      "name": "x64-debug",
+      "displayName": "x64 Debug linux",
+      "inherits": "default",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "VCPKG_TARGET_TRIPLET": "x64-linux"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "x64-release",
+      "displayName": "x64 Release linux",
+      "inherits": "default",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "VCPKG_TARGET_TRIPLET": "x64-linux"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "x64-debug-gui",
+      "displayName": "x64 Debug linux",
+      "inherits": "inherit-gui",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "VCPKG_TARGET_TRIPLET": "x64-linux"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "x64-release-gui",
+      "displayName": "x64 Release linux",
+      "inherits": "inherit-gui",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "VCPKG_TARGET_TRIPLET": "x64-linux"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "amd64-get-x-tool-aarch64-cortex53-release",
+      "displayName": "amd64-aarch64-release get cross compile toolchain",
+      "inherits": "default-aarch64-toolchain",
+      "cacheVariables": {
+        "GET_AMD64_AARCH64_CROSS_TOOLCHAIN": "ON",
+        "CMAKE_BUILD_TYPE": "Release",
+        "ARM_TARGET_MCPU": "cortex-a53"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "amd64-get-x-tool-aarch64-cortex53-debug",
+      "displayName": "amd64-aarch64-debug get cross compile toolchain",
+      "inherits": "default-aarch64-toolchain",
+      "cacheVariables": {
+        "GET_AMD64_AARCH64_CROSS_TOOLCHAIN": "ON",
+        "CMAKE_BUILD_TYPE": "Debug",
+        "ARM_TARGET_MCPU": "cortex-a53"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "x64-debug",
+      "configurePreset": "x64-debug"
+    },
+    {
+      "name": "x64-release",
+      "configurePreset": "x64-release"
+    },
+    {
+      "name": "x64-debug-gui",
+      "configurePreset": "x64-debug-gui"
+    },
+    {
+      "name": "x64-release-gui",
+      "configurePreset": "x64-release-gui"
+    },
+    {
+      "name": "amd64-get-x-tool-aarch64-cortex53-debug",
+      "configurePreset": "amd64-get-x-tool-aarch64-cortex53-debug"
+    },
+    {
+      "name": "amd64-get-x-tool-aarch64-cortex53-release",
+      "configurePreset": "amd64-get-x-tool-aarch64-cortex53-release"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "x64-debug",
+      "configurePreset": "x64-debug"
+    }
+  ]
+}

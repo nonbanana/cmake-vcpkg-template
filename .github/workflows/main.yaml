@@ -1,0 +1,93 @@
+# origin from https://github.com/lukka/CppBuildTasks-Validation/blob/3fca908df101ad26a8828e027f2990606297f9bb/.github/workflows/hosted-ninja-vcpkg_submod-triplet.yml
+
+# original comment:
+## Copyright (c) 2019-2020-2021-2022-2023 Luca Cappa
+## Released under the term specified in file LICENSE.txt
+## SPDX short identifier: MIT
+##
+## The peculiarity of this workflow is that runs `vcpkg install` at `run-vcpkg`,
+## rather than with `run-cmake.
+## Also, it does not assume that vcpkg is a submodule of this repository.
+##
+## The workflow does the following:
+## - Download and setup vcpkg (which is stored NOT in a Git submodule), then run
+##   `vcpkg install` to install the packages described in vcpkg.json manifest file.
+## - Note: at this point, all the vcpkg dependencies specified in vcpkg.json are installed,
+##   and it is possible to run anything that is needed to build the C++ application as.
+##   long the paths to headers and libraries are correctly set.
+##
+## - _Warning:_ in this sample, CMake is going to be used to build the application,
+##   but anything else could be used. This means that vcpkg will be run again and
+##   it will quickly realize that all dependencies are already installed.
+##   In short: *it is not needed to run vcpkg* in the step before if you build with CMake,
+##   since CMake will run it for you already!
+##   Look to (hosted-ninja-vcpkg_submod.yml)[./hosted-ninja-vcpkg_submod.yml] sample.
+##
+## - Finally, it runs CMake with CMakePreset.json and vcpkg's toolchain file to build
+##   the C++ sources with Ninja.
+
+name: cmake-vcpkg-build-and-release
+on:
+  pull_request:
+  push:
+    tags:
+      - "v1.*" # v{something} is a release tag
+      - "v0.*" # v{something} is a release tag
+    branches:
+      - main # cuz github cache policy, cache must exist in main branch.
+  schedule: # cuz github cache policy, refresh cache every 5 days.
+    # * is a special character in YAML so you have to quote this string
+    - cron: "0 9 1/5 * *"
+
+jobs:
+  job:
+    name: ${{ matrix.os }}-${{ github.workflow }}
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04] 
+        include:
+          - os: ubuntu-24.04
+            triplet: x64-linux
+            cmakePreset: "x64-release"
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Get CMake
+        uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: 3.31.6
+          ninjaVersion: 1.12.1
+      - name: List $RUNNER_WORKSPACE before build
+        run: find $RUNNER_WORKSPACE
+        shell: bash
+
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11
+        id: runvcpkg
+        with:
+          runVcpkgInstall: false
+
+      - name: Prints output of run-vcpkg's action.
+        run: echo "root='${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_ROOT_OUT }}', triplet='${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_DEFAULT_TRIPLET_OUT }}' "
+      # - uses: ssciwr/doxygen-install@v1 # 
+      #   with:
+      #     version: "1.13.2"
+      - name: Run CMake configure and build with preset
+        uses: lukka/run-cmake@v10
+        with:
+          cmakeListsTxtPath: "${{ github.workspace }}/CMakeLists.txt"
+          configurePreset: "${{ matrix.cmakePreset }}"
+          buildPreset: "${{ matrix.cmakePreset }}"
+          # buildPresetAdditionalArgs: "['-t package']" # build target package
+
+      - name: Release artifacts # only if the tag is a release tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "something artifacts path"
